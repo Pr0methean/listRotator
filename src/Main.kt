@@ -13,8 +13,8 @@ fun main(args : Array<String>) {
     var totalEntries = 0
     for (file in listFiles) {
         val lines = file.readLines(Charsets.UTF_8)
-            .map { line -> line.split("#")[0] }
-            .filter { line -> line.isNotBlank() }
+            .map { line -> line.split("#")[0].trim() }
+            .filter { line -> line.isNotEmpty() }
             .shuffled(random)
         if (lines.isNotEmpty()) {
             lists.add(lines)
@@ -36,6 +36,9 @@ fun main(args : Array<String>) {
                 lowestFractionDone = fractionDone
                 bestIndex = i
             }
+        }
+        if (bestIndex == -1) {
+            bestIndex = lastChoice // draw from same list twice only as a last resort
         }
         println(lists[bestIndex][listPositions[bestIndex]])
         output++
