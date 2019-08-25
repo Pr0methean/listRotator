@@ -21,6 +21,7 @@ fun main(args : Array<String>) {
         }
         totalEntries += lines.size
     }
+    lists.sortBy { -it.size } // draw from longest list first
     val listPositions = MutableList(lists.size) {0}
     var output = 0
     var lastChoice = -1
