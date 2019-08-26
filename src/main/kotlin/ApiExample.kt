@@ -17,7 +17,7 @@ import java.security.GeneralSecurityException
 import java.util.Arrays
 
 object ApiExample {
-    private val JSON_FACTORY = JacksonFactory.getDefaultInstance()
+    internal
 
     /**
      * Build and return an authorized API client service.
@@ -25,11 +25,9 @@ object ApiExample {
      * @return an authorized API client service
      * @throws GeneralSecurityException, IOException
      */
-    val service: YouTube as lazy
-        @Throws(GeneralSecurityException::class, IOException::class)
-        {
+    val service: YouTube by lazy {
             val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
-            return YouTube.Builder(httpTransport, JSON_FACTORY, null)
+            return@lazy YouTube.Builder(httpTransport, JSON_FACTORY, null)
                 .setApplicationName(APPLICATION_NAME)
                 .build()
         }
