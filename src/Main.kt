@@ -1,5 +1,16 @@
 import io.github.pr0methean.betterrandom.prng.concurrent.SingleThreadSplittableRandomAdapter
 import java.nio.file.Paths
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
+import com.google.api.client.googleapis.json.GoogleJsonResponseException
+import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.json.JsonFactory
+import com.google.api.client.json.jackson2.JacksonFactory
+
+import com.google.api.services.youtube.YouTube
+
+import java.io.IOException
+import java.security.GeneralSecurityException
+import java.util.Arrays
 
 fun main(args : Array<String>) {
     val random = SingleThreadSplittableRandomAdapter()
@@ -25,6 +36,7 @@ fun main(args : Array<String>) {
     val listPositions = MutableList(lists.size) {0}
     var output = 0
     var lastChoice = -1
+    val merged = mutableListOf<String>()
     while (output < totalEntries) {
         var bestIndex = -1
         var lowestFractionDone = 1.0
@@ -41,9 +53,16 @@ fun main(args : Array<String>) {
         if (bestIndex == -1) {
             bestIndex = lastChoice // draw from same list twice only as a last resort
         }
-        println(lists[bestIndex][listPositions[bestIndex]])
+        merged.add(lists[bestIndex][listPositions[bestIndex]])
         output++
         listPositions[bestIndex]++
         lastChoice = bestIndex
     }
+    val playlistItems = service.playlistItems()
+    // Delete existing contents
+    val listRequest = playlistItems.list(PLAYLIST_ID)
+    listRequest.setKey(DEVELOPER_KEY).execute()
+    // Define and execute the API request
+    val request = playlistItems.delete("YOUR_PLAYLIST_ITEM_ID")
+    request.setKey(DEVELOPER_KEY).execute()
 }
