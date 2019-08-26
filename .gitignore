@@ -25,5 +25,7 @@ hs_err_pid*
 /.gradle/
 /out/
 /listRotator.iml
-/src/Secrets.kt
 /build/
+
+# User secrets
+Secrets.kt
