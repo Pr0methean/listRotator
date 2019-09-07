@@ -1,32 +1,22 @@
-import ApiExample.service
+import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
+import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.youtube.YouTube
+import com.google.api.services.youtube.model.PlaylistItem
+import com.google.api.services.youtube.model.PlaylistItemSnippet
+import com.google.api.services.youtube.model.ResourceId
 import io.github.pr0methean.betterrandom.prng.concurrent.SingleThreadSplittableRandomAdapter
 import java.nio.file.Paths
-import com.google.api.services.youtube.model.ResourceId
-import com.google.api.services.youtube.model.PlaylistItemSnippet
-import com.google.api.services.youtube.model.PlaylistItem
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
-import java.util.Arrays
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
-import java.io.InputStream
-
-
-
 
 
 const val MAX_RESULTS = 50.toLong() // max allowed by YouTube
-val DEVICE_LOGIN_ENDPOINT = URI("https://accounts.google.com/o/oauth2/device/code")
-val TOKEN_ENDPOINT = URI("https://oauth2.googleapis.com/token")
+// val DEVICE_LOGIN_ENDPOINT = URI("https://accounts.google.com/o/oauth2/device/code")
+// val TOKEN_ENDPOINT = URI("https://oauth2.googleapis.com/token")
 val JSON_FACTORY: JacksonFactory = JacksonFactory.getDefaultInstance()
-val TO_INPUT_STREAM = HttpResponse.BodyHandlers.ofInputStream()
+// val TO_INPUT_STREAM = HttpResponse.BodyHandlers.ofInputStream()
 private val SCOPES = listOf("https://www.googleapis.com/auth/youtube.force-ssl")
 fun main(args : Array<String>) {
     // Create shuffled mix
@@ -49,7 +39,7 @@ fun main(args : Array<String>) {
         }
         totalEntries += lines.size
     }
-    lists.sortBy { -it.size } // draw from longest list first
+    lists.sortByDescending { it.size } // draw from longest list first
     val listPositions = MutableList(lists.size) {0}
     var output = 0
     var lastChoice = -1
@@ -106,6 +96,7 @@ fun main(args : Array<String>) {
     } while (true)
 
      */
+    // Build flow and trigger user authorization request.
     val clientSecrets = GoogleClientSecrets()
     val details = GoogleClientSecrets.Details()
     details.clientId = CLIENT_ID
