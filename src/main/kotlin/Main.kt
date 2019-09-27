@@ -112,20 +112,24 @@ fun main(args: Array<String>) {
     val listRequest = playlistItems.list("id")
     listRequest.playlistId = PLAYLIST_ID
     listRequest.maxResults = MAX_RESULTS
-    var nextPageToken: String? = null
+    // For some reason, YouTube starts at the end and returns a prevPageToken rather
+    // than a nextPageToken.
+    var prevPageToken: String? = null
     do {
-        listRequest.pageToken = nextPageToken
+        listRequest.pageToken = prevPageToken
         val listResponse = listRequest.setKey(DEVELOPER_KEY).execute()
         val items = listResponse.items
-        nextPageToken = listResponse.prevPageToken
-        if (items.isEmpty() && nextPageToken.isNullOrEmpty()) {
+        prevPageToken = listResponse.prevPageToken
+        if (items.isEmpty() && prevPageToken.isNullOrEmpty()) {
             println("Warning: detected that the playlist is currently empty!")
             break
         }
+        // FIXME: Check for a prefix of the new playlist that's a subsequence of the old;
+        // then it doesn't have to be deleted and re-added and will save quota.
         for (video in items) {
             playlistItems.delete(video.id).setKey(DEVELOPER_KEY).execute()
         }
-    } while (nextPageToken != null)
+    } while (prevPageToken != null)
     println("Adding new contents....")
     // Add new contents
     for (video in merged) {
