@@ -34,6 +34,10 @@ private val SCOPES = listOf("https://www.googleapis.com/auth/youtube.force-ssl")
  * Each list is shuffled, and the sub-lists are rotated so that they are mixed
  * as proportionately as possible, and no sub-list is drawn from twice in a row
  * unless necessary.
+ * </p><p>
+ * The constants DEVELOPER_KEY, APPLICATION_NAME, CLIENT_ID, CLIENT_SECRET and
+ * PLAYLIST_ID are stored in unpublished Kotlin files.
+ * FIXME: Switch to a standard configuration format.
  * </p>
  */
 fun main(args: Array<String>) {
@@ -144,6 +148,8 @@ fun main(args: Array<String>) {
         resourceId.videoId = video
         snippet.resourceId = resourceId
         playlistItem.snippet = snippet
+
+        // Add the item to the playlist
         playlistItems.insert("snippet", playlistItem).setKey(DEVELOPER_KEY).execute()
     }
     println("Finished!")
