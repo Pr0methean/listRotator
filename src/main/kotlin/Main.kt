@@ -11,17 +11,44 @@ import com.google.api.services.youtube.model.ResourceId
 import io.github.pr0methean.betterrandom.prng.concurrent.SingleThreadSplittableRandomAdapter
 import java.nio.file.Paths
 
+/**
+ * The maximum number of results per page when querying playlist contents. Set by YouTube.
+ */
+private const val MAX_RESULTS = 50.toLong()
 
-const val MAX_RESULTS = 50.toLong() // max allowed by YouTube
+/**
+ * Needed for the YouTube API.
+ */
 val JSON_FACTORY: JacksonFactory = JacksonFactory.getDefaultInstance()
+
+/**
+ * Access permissions. Rewriting a playlist requires that these be broad.
+ */
 private val SCOPES = listOf("https://www.googleapis.com/auth/youtube.force-ssl")
-fun main(args : Array<String>) {
+
+/**
+ * <p>
+ * Rewrites a YouTube playlist by reading from the text files in a directory
+ * specified as the first argument.
+ * </p><p>
+ * Each list is shuffled, and the sub-lists are rotated so that they are mixed
+ * as proportionately as possible, and no sub-list is drawn from twice in a row
+ * unless necessary.
+ * </p>
+ */
+fun main(args: Array<String>) {
     // Create shuffled mix
     val random = SingleThreadSplittableRandomAdapter()
-    val folder = Paths.get(if (args.isEmpty()) {""} else {args[0]}).toAbsolutePath().toFile()
+    val folder = Paths.get(
+        if (args.isEmpty()) {
+            ""
+        } else {
+            args[0]
+        }
+    ).toAbsolutePath().toFile()
     println("Working in $folder")
-    val listFiles = folder.listFiles {
-            file -> file.isFile
+    val listFiles = folder.listFiles { file ->
+        file.isFile
     } ?: error("Argument must be a directory")
     println("Found files: ${listFiles.joinToString { file -> file.toString() }}")
     val lists = mutableListOf<List<String>>()
@@ -37,7 +64,7 @@ fun main(args : Array<String>) {
         totalEntries += lines.size
     }
     lists.sortByDescending { it.size } // draw from longest list first
-    val listPositions = MutableList(lists.size) {0}
+    val listPositions = MutableList(lists.size) { 0 }
     var output = 0
     var lastChoice = -1
     val merged = mutableListOf<String>()
