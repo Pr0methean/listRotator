@@ -13,10 +13,7 @@ import java.nio.file.Paths
 
 
 const val MAX_RESULTS = 50.toLong() // max allowed by YouTube
-// val DEVICE_LOGIN_ENDPOINT = URI("https://accounts.google.com/o/oauth2/device/code")
-// val TOKEN_ENDPOINT = URI("https://oauth2.googleapis.com/token")
 val JSON_FACTORY: JacksonFactory = JacksonFactory.getDefaultInstance()
-// val TO_INPUT_STREAM = HttpResponse.BodyHandlers.ofInputStream()
 private val SCOPES = listOf("https://www.googleapis.com/auth/youtube.force-ssl")
 fun main(args : Array<String>) {
     // Create shuffled mix
@@ -61,41 +58,12 @@ fun main(args : Array<String>) {
             bestIndex = lastChoice // draw from same list twice only as a last resort
         }
         val nextVideo = lists[bestIndex][listPositions[bestIndex]]
+        listPositions[bestIndex]++
         merged.add(nextVideo)
         println(nextVideo)
         output++
-        listPositions[bestIndex]++
         lastChoice = bestIndex
     }
-    // Log into YouTube
-    /*
-    val httpClient = HttpClient.newHttpClient()
-    val loginUrlRequest = HttpRequest.newBuilder(DEVICE_LOGIN_ENDPOINT)
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .POST(HttpRequest.BodyPublishers.ofString("client_id=$CLIENT_ID&scope=email%20profile%20clientid%20../auth/youtube"))
-        .build()
-    val loginRawResponse = httpClient.send(loginUrlRequest, TO_INPUT_STREAM)
-    val json: LoginUrlResponse =
-        JSON_FACTORY.createJsonParser(loginRawResponse.body()).parse(LoginUrlResponse::class.java, true) as LoginUrlResponse
-    println("Visit this page: ${json.verification_url}")
-    println("Then enter this code: ${json.user_code}")
-    val tokenRequest = HttpRequest.newBuilder(TOKEN_ENDPOINT)
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .POST(HttpRequest.BodyPublishers.ofString(
-            "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&code=${json.device_code}&grant_type=http://oauth.net/grant_type/device/1.0"))
-        .build()
-    lateinit var token: TokenResponse
-    do {
-        val tokenRawResponse = httpClient.send(tokenRequest, TO_INPUT_STREAM)
-        token = JSON_FACTORY.createJsonParser(tokenRawResponse.body()).parse(TokenResponse::class.java, true) as TokenResponse
-        if (token.error != null) {
-            Thread.sleep(1000 * json.interval)
-        } else {
-            break
-        }
-    } while (true)
-
-     */
     // Build flow and trigger user authorization request.
     val clientSecrets = GoogleClientSecrets()
     val details = GoogleClientSecrets.Details()
@@ -110,6 +78,7 @@ fun main(args : Array<String>) {
     val service = YouTube.Builder(httpTransport, JSON_FACTORY, credential)
         .setApplicationName(APPLICATION_NAME)
         .build()
+    println("Deleting old contents....")
     val playlistItems = service.playlistItems()
 
     // Delete old contents
@@ -123,13 +92,14 @@ fun main(args : Array<String>) {
         val items = listResponse.items
         nextPageToken = listResponse.prevPageToken
         if (items.isEmpty() && nextPageToken.isNullOrEmpty()) {
-            error(listResponse)
+            println("Warning: detected that the playlist is currently empty!")
+            break
         }
         for (video in items) {
             playlistItems.delete(video.id).setKey(DEVELOPER_KEY).execute()
         }
     } while (nextPageToken != null)
-
+    println("Adding new contents....")
     // Add new contents
     for (video in merged) {
         val playlistItem = PlaylistItem()
@@ -145,4 +115,5 @@ fun main(args : Array<String>) {
         playlistItem.snippet = snippet
         playlistItems.insert("snippet", playlistItem).setKey(DEVELOPER_KEY).execute()
     }
+    println("Finished!")
 }
