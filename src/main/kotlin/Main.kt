@@ -40,16 +40,11 @@ private val SCOPES = listOf("https://www.googleapis.com/auth/youtube.force-ssl")
  * FIXME: Switch to a standard configuration format.
  * </p>
  */
-fun main(args: Array<String>) {
+fun main(args: Array<out String>) {
     // Create shuffled mix
     val random = SingleThreadSplittableRandomAdapter()
-    val folder = Paths.get(
-        if (args.isEmpty()) {
-            ""
-        } else {
-            args[0]
-        }
-    ).toAbsolutePath().toFile()
+    val folder = Paths.get(if (args.isEmpty()) "" else args[0])
+        .toAbsolutePath().toFile()
     println("Working in $folder")
     val listFiles = folder.listFiles { file ->
         file.isFile
