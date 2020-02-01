@@ -8,7 +8,7 @@ import com.google.api.services.youtube.YouTube
 import com.google.api.services.youtube.model.PlaylistItem
 import com.google.api.services.youtube.model.PlaylistItemSnippet
 import com.google.api.services.youtube.model.ResourceId
-import io.github.pr0methean.betterrandom.prng.concurrent.SingleThreadSplittableRandomAdapter
+import io.github.pr0methean.betterrandom.prng.adapter.SingleThreadSplittableRandomAdapter
 import java.nio.file.Paths
 
 /**
