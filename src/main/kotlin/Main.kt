@@ -63,7 +63,7 @@ fun main(args: Array<out String>) {
         totalEntries += lines.size
     }
     lists.shuffle(random) // so that sort below (which is stable) gets random tiebreaking
-    lists.sortByDescending { it.size } // draw from longest list first
+    lists.sortByDescending(List<*>::size) // draw from longest list first
     val listPositions = MutableList(lists.size) { 0 }
     var output = 0
     var lastChoice = -1
